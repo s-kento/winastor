@@ -34,7 +34,10 @@ public class JUnitIndirectExecutorProcess extends JUnitExecutorProcess {
 	 * 
 	 * @param p
 	 * @return
-	 */
+	 */ 
+	
+
+	
 	@Override
 	protected TestResult getTestResult(BufferedReader in) {
 		log.debug("Analyzing output from process");

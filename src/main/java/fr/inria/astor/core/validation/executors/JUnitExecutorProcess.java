@@ -45,11 +45,20 @@ public abstract class JUnitExecutorProcess {
 
 	boolean outputInFile = ConfigurationProperties.getPropertyBool("processoutputinfile");
 
+	
+	/*
+	 * スレッドを一つ立ててやる
+	 * 
+	 * 
+	 * (non-Javadoc)
+	 * @see fr.inria.astor.core.validation.executors.JUnitExecutorProcess#getTestResult(java.io.BufferedReader)
+	 */
+	
 	public TestResult execute(String jvmPath, String classpath, List<String> classesToExecute, int waitTime) {
 		Process p = null;
 		jvmPath += File.separator + "java";
 		String systemcp = defineInitialClasspath();
-
+ 
 		classpath = systemcp + File.pathSeparator + classpath;
 
 		List<String> cls = new ArrayList<>(classesToExecute);
@@ -61,16 +70,19 @@ public abstract class JUnitExecutorProcess {
 
 			List<String> command = new ArrayList<String>();
 
-			command.add(jvmPath);
+			//execute target java program
+			//command.add(jvmPath);
+			command.add("java");
 			command.add("-Xmx2048m");
 			command.add("-cp");
 			command.add(classpath);
 			command.add(classNameToCall());
 			command.addAll(cls);
-
+			
+			//print log
 			printCommandToExecute(command);
 
-			ProcessBuilder pb = new ProcessBuilder("/bin/bash");
+			/*ProcessBuilder pb = new ProcessBuilder("/bin/bash");
 
 			if (outputInFile) {
 				pb.redirectOutput(ftemp);
@@ -94,7 +106,8 @@ public abstract class JUnitExecutorProcess {
 				p_stdin.flush();
 				p_stdin.write("echo $TZ");
 				p_stdin.newLine();
-				p_stdin.flush();
+				p_stdin.flush();			
+				
 				// Writing the command
 				p_stdin.write(toString(command));
 
@@ -108,17 +121,30 @@ public abstract class JUnitExecutorProcess {
 
 			} catch (IOException e) {
 				log.error(e);
-			}
+			}*/
+			
+			ProcessBuilder pb = new ProcessBuilder(command);
 
-			//
+			if (outputInFile) {
+				pb.redirectOutput(ftemp);
+			} else
+				pb.redirectOutput();
+			pb.redirectErrorStream(true);
+			pb.directory(new File((ConfigurationProperties.getProperty("location"))));
+			long t_start = System.currentTimeMillis();
+			p = pb.start();
+
+			//wait for end of subprocess or end of the time
 			p.waitFor(waitTime, TimeUnit.MILLISECONDS);
+			
 			long t_end = System.currentTimeMillis();
 			log.debug("Execution time " + ((t_end - t_start) / 1000) + " seconds");
 
 			if (!avoidInterruption) {
 				log.debug("Running Exit Value");
 				// We force obtaining the exit value.
-				p.exitValue();
+				//p.destroy();
+				//p.exitValue();
 			}
 
 			BufferedReader output = null;
@@ -126,11 +152,14 @@ public abstract class JUnitExecutorProcess {
 				output = new BufferedReader(new FileReader(ftemp.getAbsolutePath()));
 			else
 				output = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			
 			TestResult tr = getTestResult(output);
+
+			//destroy subprocess
 			p.destroyForcibly();
 			return tr;
 		} catch (IOException | InterruptedException | IllegalThreadStateException ex) {
-			log.info("The Process that runs JUnit test cases had problems: " + ex.getMessage());
+			log.info("The Process that runs JUnit test cases had problems: " + ex.getMessage() + ex);
 			if (p != null)
 				p.destroyForcibly();
 		}

@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +20,10 @@ import fr.inria.astor.core.entities.ModificationPoint;
 import fr.inria.astor.core.entities.OperatorInstance;
 import fr.inria.astor.core.entities.ProgramVariant;
 import fr.inria.astor.core.setup.ProjectRepairFacade;
+
+import difflib.Delta;
+import difflib.DiffUtils;
+import difflib.Patch;
 
 /**
  * Diff creator
@@ -67,7 +75,7 @@ public class PatchDiffCalculator {
 
 		try {
 			String line = "";
-			ProcessBuilder builder = new ProcessBuilder("/bin/bash");
+			/*ProcessBuilder builder = new ProcessBuilder("/bin/bash");
 			builder.redirectErrorStream(true);
 
 			Process process = builder.start();
@@ -76,6 +84,7 @@ public class PatchDiffCalculator {
 
 			try {
 				// Set up the timezone
+				//get difference
 				p_stdin.write("diff -w -b -u " + original.getAbsolutePath() + " " + newvariant.getAbsolutePath());
 				p_stdin.newLine();
 				p_stdin.flush();
@@ -87,23 +96,33 @@ public class PatchDiffCalculator {
 
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
+			}*/
+			
+			List<String> originalLine = Files.readAllLines(Paths.get(original.getAbsolutePath()), Charset.defaultCharset());
+			List<String> newvariantLine = Files.readAllLines(Paths.get(original.getAbsolutePath()), Charset.defaultCharset());
+			
+			Patch<String> patch = DiffUtils.diff(originalLine,newvariantLine);
 
-			process.waitFor(30, TimeUnit.SECONDS);
+			//process.waitFor(30, TimeUnit.SECONDS);
 
-			InputStream stderr = process.getErrorStream();
-			InputStream stdout = process.getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stdout));
+//			InputStream stderr = process.getErrorStream();
+//			InputStream stdout = process.getInputStream();
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(stdout));
 			String dd = "";
-			while ((line = reader.readLine()) != null) {
-
-				if (line.startsWith("---") || line.startsWith("+++"))
-					dd += line.split("2017-")[0] + "\n";
-				else
-					dd += line + "\n";
-
+//			while ((line = reader.readLine()) != null) {
+//
+//				if (line.startsWith("---") || line.startsWith("+++"))
+//					dd += line.split("2017-")[0] + "\n";
+//				else
+//					dd += line + "\n";
+//
+//			}
+			for(Delta delta: patch.getDeltas()){
+				dd += delta + "\n";
 			}
-			process.destroyForcibly();
+			
+			
+//			process.destroyForcibly();
 			return dd;
 		} catch (Exception e) {
 			e.printStackTrace();
