@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +125,7 @@ public abstract class JUnitExecutorProcess {
 			}*/
 			
 			ProcessBuilder pb = new ProcessBuilder(command);
-
+			
 			if (outputInFile) {
 				pb.redirectOutput(ftemp);
 			} else
@@ -180,11 +181,18 @@ public abstract class JUnitExecutorProcess {
 	 */
 	protected abstract TestResult getTestResult(BufferedReader br);
 
-	protected String urlArrayToString(URL[] urls) {
+	protected String urlArrayToString(URL[] urls){
 		String s = "";
 		for (int i = 0; i < urls.length; i++) {
 			URL url = urls[i];
-			s += url.getPath() + File.pathSeparator;
+			
+			try {
+				s += new File(url.toURI()).getAbsolutePath() + File.pathSeparator;
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				throw new RuntimeException(e);
+				
+			}
 		}
 		return s;
 	}

@@ -163,7 +163,7 @@ public class ProcessValidator extends ProgramValidator {
 		for (String path : classpath.split(File.pathSeparator)) {
 
 			File f = new File(path);
-			originalURL.add(new URL("file://" + f.getAbsolutePath()));
+			originalURL.add(new URL("file:/" + f.getAbsolutePath()));
 
 		}
 
