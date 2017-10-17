@@ -21,14 +21,24 @@ import fr.inria.astor.core.setup.FinderTestCases;
 import fr.inria.astor.core.setup.ProjectRepairFacade;
 import fr.inria.main.AbstractMain;
 import fr.inria.main.ExecutionMode;
+import search.MethodInfo;
 
 /**
  * Astor main
- * 
+ *
  * @author Matias Martinez, matias.martinez@inria.fr
  *
  */
 public class AstorMain extends AbstractMain {
+
+	public MethodInfo targetMethod=null;
+
+	public AstorMain(MethodInfo targetMethod){
+		this.targetMethod=targetMethod;
+	}
+
+	public AstorMain(){
+	}
 
 	protected Logger log = Logger.getLogger(AstorMain.class.getName());
 
@@ -53,8 +63,8 @@ public class AstorMain extends AbstractMain {
 
 	/**
 	 * It creates a repair engine according to an execution mode.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param removeMode
 	 * @return
 	 * @throws Exception
@@ -66,17 +76,17 @@ public class AstorMain extends AbstractMain {
 
 		if (ExecutionMode.jKali.equals(mode)) {
 			astorCore = new JKaliEngine(mutSupporter, projectFacade);
-		
+
 		} else if (ExecutionMode.jGenProg.equals(mode)) {
 			astorCore = new JGenProg(mutSupporter, projectFacade);
-			
+
 
 		} else if (ExecutionMode.MutRepair.equals(mode)) {
 			astorCore = new MutationalExhaustiveRepair(mutSupporter, projectFacade);
-		
+
 		} else if (ExecutionMode.EXASTOR.equals(mode)) {
 			astorCore = new ExhaustiveAstorEngine(mutSupporter, projectFacade);
-			
+
 		} else {
 			// If the execution mode is any of the predefined, Astor
 			// interpretates as
@@ -89,17 +99,19 @@ public class AstorMain extends AbstractMain {
 
 		//Loading extension Points
 		astorCore.loadExtensionPoints();
-		
+
 		// Initialize Population
-		astorCore.createInitialPopulation();
-		
+		if(null==targetMethod)
+			astorCore.createInitialPopulation();
+		else
+			astorCore.createInitialPopulation(targetMethod);
 		return astorCore;
 
 	}
 
 	/**
 	 * We create an instance of the Engine which name is passed as argument.
-	 * 
+	 *
 	 * @param customEngine
 	 * @param mutSupporter
 	 * @param projectFacade
@@ -166,7 +178,7 @@ public class AstorMain extends AbstractMain {
 	/**
 	 * Load extensions point that are used for all approaches. For the moment it
 	 * loads only the "patch priorization point""
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	private boolean loadCommonExtensionPoints(AstorCoreEngine astorCore) {
@@ -195,6 +207,8 @@ public class AstorMain extends AbstractMain {
 		AstorMain m = new AstorMain();
 		m.execute(args);
 	}
+
+
 
 	public void execute(String[] args) throws Exception {
 		boolean correct = processArguments(args);

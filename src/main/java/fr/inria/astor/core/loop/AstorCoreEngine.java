@@ -43,14 +43,15 @@ import fr.inria.astor.util.StringUtil;
 import fr.inria.astor.util.TimeUtil;
 import fr.inria.main.evolution.ExtensionPoints;
 import fr.inria.main.evolution.PlugInLoader;
+import search.MethodInfo;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtType;
 
 /**
  * Evolutionary program transformation Loop
- * 
+ *
  * @author Matias Martinez, matias.martinez@inria.fr
- * 
+ *
  */
 public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
@@ -103,7 +104,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 	protected VariantCompiler compiler = null;
 
 	/**
-	 * 
+	 *
 	 * @param mutatorExecutor
 	 * @throws JSAPException
 	 */
@@ -189,7 +190,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Check whether the program has passed the maximum time for operating
-	 * 
+	 *
 	 * @param dateInit
 	 *            start date of execution
 	 * @param maxMinutes
@@ -232,7 +233,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Process a generation i: loops over all instances
-	 * 
+	 *
 	 * @param generation
 	 * @return
 	 * @throws Exception
@@ -282,7 +283,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 	/**
 	 * Store in the program variant passed as parameter a clone of each ctclass
 	 * involved in the variant.
-	 * 
+	 *
 	 * @param variant
 	 */
 	private void storeModifiedModel(ProgramVariant variant) {
@@ -359,7 +360,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 		}
 		return true;
 	}
-	
+
 	public void saveVariant(ProgramVariant programVariant) throws Exception{
 
 		String srcOutput = projectFacade.getInDirWithPrefix(programVariant.currentMutatorIdentifier());
@@ -367,12 +368,12 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 		// This method should be refactored, and replace by the
 		// output from memory compilation
 		mutatorSupporter.saveSourceCodeOnDiskProgramVariant(programVariant, srcOutput);
-		
+
 	}
 	/**
-	 * 
+	 *
 	 * Compiles and validates a created variant.
-	 * 
+	 *
 	 * @param parentVariant
 	 * @param generation
 	 * @return true if the variant is a solution. False otherwise.
@@ -389,7 +390,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 		storeModifiedModel(programVariant);
 
-		
+
 		if (ConfigurationProperties.getPropertyBool("saveall")) {
 			this.saveVariant(programVariant);
 		}
@@ -411,7 +412,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 				if (ConfigurationProperties.getPropertyBool("savesolution")) {
 					//mutatorSupporter.saveSourceCodeOnDiskProgramVariant(programVariant, srcOutput);
 					saveVariant(programVariant);
-					
+
 				}
 				return true;
 			}
@@ -441,7 +442,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 	/**
 	 * Create a child mutated. Return null if not mutation is produced by the
 	 * engine (i.e. the child is equal to the parent)
-	 * 
+	 *
 	 * @param parentVariant
 	 * @param generation
 	 * @param idsChild
@@ -477,7 +478,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Undo in reverse order that the mutation were applied.
-	 * 
+	 *
 	 * @param variant
 	 * @param generation
 	 */
@@ -511,7 +512,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 	 * Given a program variant, the method generates operations for modifying
 	 * that variants. Each operation is related to one gen of the program
 	 * variant.
-	 * 
+	 *
 	 * @param variant
 	 * @param generation
 	 * @return
@@ -602,7 +603,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 	/**
 	 * Return true if the gen passed as parameter was already affected by a
 	 * previous operator.
-	 * 
+	 *
 	 * @param genProgInstance
 	 * @param map
 	 * @param generation
@@ -625,7 +626,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param variant
 	 * @param modificationPoints
 	 * @return
@@ -705,10 +706,12 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	public abstract void createInitialPopulation() throws Exception;
 
+	public abstract void createInitialPopulation(MethodInfo targetMethod) throws Exception;
+
 	/**
 	 * This method updates gens of a variant according to a created
 	 * GenOperationInstance
-	 * 
+	 *
 	 * @param variant
 	 * @param operationofGen
 	 */
@@ -716,7 +719,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Create a Gen Mutation for a given CtElement
-	 * 
+	 *
 	 * @param ctElementPointed
 	 * @param className
 	 * @param suspValue
@@ -730,7 +733,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Apply a mutation generated in previous generation to a model
-	 * 
+	 *
 	 * @param variant
 	 * @param currentGeneration
 	 * @throws IllegalAccessException
@@ -757,7 +760,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Apply the mutation generated in the current Generation
-	 * 
+	 *
 	 * @param variant
 	 * @param currentGeneration
 	 * @throws IllegalAccessException
@@ -797,7 +800,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Apply a given Mutation to the node referenced by the operation
-	 * 
+	 *
 	 * @param operation
 	 * @throws IllegalAccessException
 	 */
@@ -969,7 +972,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	/**
 	 * Load the extension Points according to the requirements of the engine
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void loadExtensionPoints() throws Exception {
