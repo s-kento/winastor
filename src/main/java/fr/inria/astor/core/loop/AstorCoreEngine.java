@@ -14,11 +14,11 @@ import org.apache.log4j.Logger;
 
 import com.martiansoftware.jsap.JSAPException;
 
-import fr.inria.astor.core.entities.OperatorInstance;
 import fr.inria.astor.core.entities.ModificationPoint;
+import fr.inria.astor.core.entities.OperatorInstance;
 import fr.inria.astor.core.entities.ProgramVariant;
-import fr.inria.astor.core.entities.VariantValidationResult;
 import fr.inria.astor.core.entities.SuspiciousModificationPoint;
+import fr.inria.astor.core.entities.VariantValidationResult;
 import fr.inria.astor.core.entities.WeightCtElement;
 import fr.inria.astor.core.faultlocalization.FaultLocalizationStrategy;
 import fr.inria.astor.core.loop.extension.AstorExtensionPoint;
@@ -43,7 +43,6 @@ import fr.inria.astor.util.StringUtil;
 import fr.inria.astor.util.TimeUtil;
 import fr.inria.main.evolution.ExtensionPoints;
 import fr.inria.main.evolution.PlugInLoader;
-import search.MethodInfo;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtType;
 
@@ -361,7 +360,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 		return true;
 	}
 
-	public void saveVariant(ProgramVariant programVariant) throws Exception{
+	public void saveVariant(ProgramVariant programVariant) throws Exception {
 
 		String srcOutput = projectFacade.getInDirWithPrefix(programVariant.currentMutatorIdentifier());
 		log.debug("\n-Saving child on disk variant #" + programVariant.getId() + " at " + srcOutput);
@@ -370,6 +369,7 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 		mutatorSupporter.saveSourceCodeOnDiskProgramVariant(programVariant, srcOutput);
 
 	}
+
 	/**
 	 *
 	 * Compiles and validates a created variant.
@@ -390,7 +390,6 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 		storeModifiedModel(programVariant);
 
-
 		if (ConfigurationProperties.getPropertyBool("saveall")) {
 			this.saveVariant(programVariant);
 		}
@@ -410,7 +409,8 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 				log.info("-Found Solution, child variant #" + programVariant.getId());
 				saveStaticSucessful(programVariant.getId(), generation);
 				if (ConfigurationProperties.getPropertyBool("savesolution")) {
-					//mutatorSupporter.saveSourceCodeOnDiskProgramVariant(programVariant, srcOutput);
+					// mutatorSupporter.saveSourceCodeOnDiskProgramVariant(programVariant,
+					// srcOutput);
 					saveVariant(programVariant);
 
 				}
@@ -706,7 +706,8 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 
 	public abstract void createInitialPopulation() throws Exception;
 
-	public abstract void createInitialPopulation(MethodInfo targetMethod) throws Exception;
+	public abstract void createInitialPopulation(String className, String methodName, int startLine, int endLine)
+			throws Exception;
 
 	/**
 	 * This method updates gens of a variant according to a created
@@ -903,9 +904,9 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 						// the property fixed statement
 						if (genOperationInstance.getModified().toString() != genOperationInstance.getOriginal()
 								.toString())
-						line += genOperationInstance.getModified().toString();
+							line += genOperationInstance.getModified().toString();
 						else {
-						line += genOperationInstance.getOriginal().toString();
+							line += genOperationInstance.getOriginal().toString();
 						}
 
 					line += "\ngeneration= " + Integer.toString(i);

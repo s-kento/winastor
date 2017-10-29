@@ -34,7 +34,6 @@ import fr.inria.astor.core.stats.Stats;
 import fr.inria.astor.core.stats.Stats.Pair;
 import fr.inria.main.evolution.ExtensionPoints;
 import fr.inria.main.evolution.PlugInLoader;
-import search.MethodInfo;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
@@ -69,7 +68,7 @@ public class JGenProg extends AstorCoreEngine {
 		}
 	}
 
-	public void createInitialPopulation(MethodInfo targetMethod) throws Exception {
+	public void createInitialPopulation(String className, String methodName, int startLine, int endLine) throws Exception {
 
 		// Creates the spoon model
 		initModel();
@@ -106,12 +105,12 @@ public class JGenProg extends AstorCoreEngine {
 				index2 = suspiciousMethodName.indexOf("(");
 				suspiciousMethodName = suspiciousMethodName.substring(index+1, index2);
 				suspiciousLine = s.getLineNumber();
-				targetClassName = targetMethod.getClassName();
+				targetClassName = className;
 				index = targetClassName.lastIndexOf(".");
 				targetPackageName = targetClassName.substring(0, index);
-				targetMethodName = targetMethod.getMethodName();
+				targetMethodName = methodName;
 				if (!suspiciousPackageName.equals(targetPackageName) || !suspiciousMethodName.equals(targetMethodName)
-						|| suspiciousLine < targetMethod.getStartLine() || suspiciousLine > targetMethod.getEndLine()) {
+						|| suspiciousLine < startLine || suspiciousLine > endLine) {
 					it.remove();
 				}
 			}

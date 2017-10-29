@@ -20,8 +20,7 @@ import fr.inria.astor.core.setup.ConfigurationProperties;
 import fr.inria.astor.core.setup.FinderTestCases;
 import fr.inria.astor.core.setup.ProjectRepairFacade;
 import fr.inria.main.AbstractMain;
-import fr.inria.main.ExecutionMode;
-import search.MethodInfo;
+import fr.inria.main.ExecutionMode;;
 
 /**
  * Astor main
@@ -31,13 +30,19 @@ import search.MethodInfo;
  */
 public class AstorMain extends AbstractMain {
 
-	public MethodInfo targetMethod=null;
+	private String className;
+	private String methodName;
+	private int startLine;
+	private int endLine;
 
-	public AstorMain(MethodInfo targetMethod){
-		this.targetMethod=targetMethod;
+	public AstorMain(String className, String methodName, int startLine, int endLine) {
+		this.className = className;
+		this.methodName = methodName;
+		this.startLine = startLine;
+		this.endLine = endLine;
 	}
 
-	public AstorMain(){
+	public AstorMain() {
 	}
 
 	protected Logger log = Logger.getLogger(AstorMain.class.getName());
@@ -80,7 +85,6 @@ public class AstorMain extends AbstractMain {
 		} else if (ExecutionMode.jGenProg.equals(mode)) {
 			astorCore = new JGenProg(mutSupporter, projectFacade);
 
-
 		} else if (ExecutionMode.MutRepair.equals(mode)) {
 			astorCore = new MutationalExhaustiveRepair(mutSupporter, projectFacade);
 
@@ -97,14 +101,14 @@ public class AstorMain extends AbstractMain {
 
 		}
 
-		//Loading extension Points
+		// Loading extension Points
 		astorCore.loadExtensionPoints();
 
 		// Initialize Population
-		if(null==targetMethod)
+		if (null == className)
 			astorCore.createInitialPopulation();
 		else
-			astorCore.createInitialPopulation(targetMethod);
+			astorCore.createInitialPopulation(className, methodName, startLine, endLine);
 		return astorCore;
 
 	}
@@ -207,8 +211,6 @@ public class AstorMain extends AbstractMain {
 		AstorMain m = new AstorMain();
 		m.execute(args);
 	}
-
-
 
 	public void execute(String[] args) throws Exception {
 		boolean correct = processArguments(args);
