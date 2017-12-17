@@ -1,6 +1,6 @@
 package fr.inria.astor.core.manipulation.bytecode.compiler.tools;
 
-import static java.util.Arrays.asList;
+import static java.util.Arrays.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +29,7 @@ public class JavaXToolsCompiler {
 	private DiagnosticCollector<JavaFileObject> diagnostics;
 
 	public JavaXToolsCompiler() {
-		options = asList("-nowarn");
+		options = asList(new String[] {"-nowarn","-XDuseUnsharedTable"});
 		compiler = ToolProvider.getSystemJavaCompiler();
 		diagnostics = new DiagnosticCollector<JavaFileObject>();
 		StandardJavaFileManager standardFileManager = compiler().getStandardFileManager(diagnostics(), null, null);
@@ -40,7 +40,7 @@ public class JavaXToolsCompiler {
 			Map<String, byte[]> compiledDependencies, List<String> options) {
 		diagnostics = new DiagnosticCollector<JavaFileObject>();
 		fileManager.classFiles().clear();
-		
+
 		Collection<JavaFileObject> units = addCompilationUnits(qualifiedNameAndContent);
 		fileManager.addCompiledClasses(compiledDependencies);
 		CompilationTask task = compiler().getTask(null, fileManager, diagnostics(), options, null, units);
@@ -102,7 +102,7 @@ public class JavaXToolsCompiler {
 		return bytecodes;
 	}
 
-	
+
 	private String topClassName(String qualifiedName) {
 		return qualifiedName.split("[$]")[0];
 	}
